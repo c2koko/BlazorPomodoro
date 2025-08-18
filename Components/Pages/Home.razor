@@ -25,15 +25,22 @@
         <div id="reset-container" @onclick="PomodoroReset"> <img src="https://cdn.shaneduffy.io/moe-pomodoro/reset.webp" />
         </div>
 </div>
-<audio id="bg-music" src="music.mp3" autoplay loop></audio>
+
+<audio id="bg-music" src="music.mp3" autoplay loop onloadedmetadata="this.volume=@pomodoroVolume"></audio>
+
+<h1>hangerő = @pomodoroVolume ------ tab inaktív: @isTabInactive</h1>
 
 
 @code {
+    // zene jelenleg nem működik.
+
     private User? user;
     private CancellationTokenSource? timerCts;
     private bool showCelebration = false;
     private bool jsInitialized = false;
     private string backgroundUrl = "/default-background.png";
+    private bool isTabInactive;
+    private static double pomodoroVolume = 0.5;
 
     private HttpClient _client = new HttpClient();
     private SystemTimer _timer = new SystemTimer(1000);
@@ -65,11 +72,20 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !jsInitialized)
+        if (firstRender)
         {
-            jsInitialized = true;
-            await JSRuntime.InvokeVoidAsync("initTabVisibility"); // for tab visiblity but only after javascript is initialized
+            await JS.InvokeVoidAsync("eval", @"
+                document.addEventListener('visibilitychange', () => {
+                    DotNet.invokeMethodAsync('YOUR_ASSEMBLY_NAME', 'OnVisibilityChanged', document.hidden);
+                });
+            ");
         }
+    }
+    [JSInvokable]
+    public static void OnVisibilityChanged(bool hidden)
+    {
+        //                    inactive : active
+        pomodoroVolume = (hidden ? 0.2 : 0.5);
     }
     private void GetBackground()
     {
@@ -132,4 +148,8 @@
         }
         StateHasChanged();
     }
+
+
+
+
 }
