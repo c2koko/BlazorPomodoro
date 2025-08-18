@@ -25,6 +25,8 @@
         <div id="reset-container" @onclick="PomodoroReset"> <img src="https://cdn.shaneduffy.io/moe-pomodoro/reset.webp" />
         </div>
 </div>
+<audio id="bg-music" src="music.mp3" autoplay loop></audio>
+
 
 @code {
     private User? user;
@@ -77,11 +79,6 @@
         }
         else { backgroundUrl = "/default-background.png"; }
     }
-    private async Task PlayMusic()
-    {
-        await JSRuntime.InvokeVoidAsync("startBackgroundMusic");
-    }
-
 
     // Pomodoro methods
     private void StartTimer()
