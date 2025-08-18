@@ -1,0 +1,138 @@
+﻿@page "/"
+@using SystemTimer = System.Timers.Timer;
+@using Microsoft.JSInterop
+@using BlazorWeb.Services
+@using BlazorWeb.Models
+@using System.Security.Principal;
+@inject UserService UserService
+@inject IJSRuntime JSRuntime
+@inject IJSRuntime JS
+@inherits ComponentBase
+
+<PageTitle>@pomodoroTime</PageTitle>
+
+
+<style>html, body {background: url('@backgroundUrl');background-size: cover;background-color: black;}
+</style>
+<div id="inner-container">
+        <h1>Welcome @GetUserName().ToString()!</h1>
+        <h1>Streaks: @GetStreaks().ToString()</h1>
+            <div id="clock-container" @onclick="PomodoroToggle">
+            <p id="time-text">@PomodoroTimerString</p>
+            <div id="clock-background" style="--clock-background-color:Black"></div>
+            <div id="clock-foreground"></div>
+        </div>
+        <div id="reset-container" @onclick="PomodoroReset"> <img src="https://cdn.shaneduffy.io/moe-pomodoro/reset.webp" />
+        </div>
+</div>
+
+@code {
+    private User? user;
+    private CancellationTokenSource? timerCts;
+    private bool showCelebration = false;
+    private bool jsInitialized = false;
+    private string backgroundUrl = "/default-background.png";
+
+    private HttpClient _client = new HttpClient();
+    private SystemTimer _timer = new SystemTimer(1000);
+
+    private static readonly TimeSpan time25 = TimeSpan.FromMinutes(25);
+    private static readonly TimeSpan time5 = TimeSpan.FromMinutes(5);
+
+    private bool pomodoroActive = false;
+    private TimeSpan pomodoroTime = time25;
+    private TimeSpan pomodoroOriginalTimeSpan = time25;
+    private DateTime pomodoroStartTime;
+    private bool pomodoroWork = true;
+
+    public string PomodoroTimerString { get {   return pomodoroTime.ToString(@"mm\:ss");   } }
+
+    // Main methods
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserService.GetUser();
+        GetBackground();
+        if (user != null && user.Streak > 0 && user.Streak % 7 == 0)
+        {
+            showCelebration = true;
+        }
+    }
+    private void CloseCelebration() => showCelebration = false;
+    private string GetUserName() => WindowsIdentity.GetCurrent().Name.Split('\\').Last();
+    private string GetStreaks() => user?.Streak.ToString() ?? "0";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !jsInitialized)
+        {
+            jsInitialized = true;
+            await JSRuntime.InvokeVoidAsync("initTabVisibility"); // for tab visiblity but only after javascript is initialized
+        }
+    }
+    private void GetBackground()
+    {
+        if (user?.Streak >= 3)
+        {
+            backgroundUrl = user.Streak % 7 == 0 ? "/fire-background.png" : "/streak-background.png";
+        }
+        else { backgroundUrl = "/default-background.png"; }
+    }
+    private async Task PlayMusic()
+    {
+        await JSRuntime.InvokeVoidAsync("startBackgroundMusic");
+    }
+
+
+    // Pomodoro methods
+    private void StartTimer()
+    {
+        pomodoroStartTime = DateTime.Now;
+        _timer.Start();
+    }
+    private void PauseTimer()
+    {
+        _timer.Stop();
+    }
+    private void PomodoroToggle()
+    {
+        if (pomodoroActive)
+        {
+            pomodoroOriginalTimeSpan = pomodoroTime;
+            _timer.Stop();
+        }
+        else
+        {
+            pomodoroStartTime = DateTime.Now;
+            _timer.Start();
+        }
+        pomodoroActive = !pomodoroActive;
+    }
+    private void PomodoroReset()
+    {
+        _timer.Stop();
+        if (pomodoroWork)
+        {
+            pomodoroOriginalTimeSpan = time5;
+        }
+        else
+        {
+            pomodoroOriginalTimeSpan = time25;
+        }
+        pomodoroTime = pomodoroOriginalTimeSpan;
+        pomodoroWork = !pomodoroWork;
+        pomodoroActive = false;
+    }
+    private void Tick(DateTime signalTime)
+    {
+        var time = pomodoroOriginalTimeSpan.Subtract(signalTime - pomodoroStartTime).Add(TimeSpan.FromSeconds(1));
+        if (pomodoroTime.TotalSeconds == 0)
+        {
+            PomodoroReset();
+        }
+        else
+        {
+            pomodoroTime = time;
+        }
+        StateHasChanged();
+    }
+}
