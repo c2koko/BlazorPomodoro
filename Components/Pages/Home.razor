@@ -8,14 +8,11 @@
 @inject IJSRuntime JSRuntime
 @inject IJSRuntime JS
 @inherits ComponentBase
-
 <PageTitle>@pomodoroTime</PageTitle>
 
-
-<style>html, body {background: url('@backgroundUrl');background-size: cover;background-color: black;}
-</style>
-<div id="inner-container">
-        <h1>Welcome @GetUserName().ToString()!</h1>
+<style>html, body {background: url('@backgroundUrl');background-size: cover;background-color: black;} </style>
+<div id="inner-container" style="font-family: 'Comic Sans MS';font-weight:bold">
+    <h1>Welcome @GetUserName().ToString()!</h1>
         <h1>Streaks: @GetStreaks().ToString()</h1>
             <div id="clock-container" @onclick="PomodoroToggle">
             <p id="time-text">@PomodoroTimerString</p>
@@ -32,7 +29,7 @@
 
 
 @code {
-    // zene jelenleg nem működik.
+    // zene jelenleg nem működik. elvileg nem változott semmi, egyszer működött
 
     private User? user;
     private CancellationTokenSource? timerCts;
@@ -76,17 +73,14 @@
         {
             await JS.InvokeVoidAsync("eval", @"
                 document.addEventListener('visibilitychange', () => {
-                    DotNet.invokeMethodAsync('YOUR_ASSEMBLY_NAME', 'OnVisibilityChanged', document.hidden);
+                    DotNet.invokeMethodAsync('BlazorWeb', 'OnVisibilityChanged', document.hidden);
                 });
             ");
         }
     }
     [JSInvokable]
-    public static void OnVisibilityChanged(bool hidden)
-    {
-        //                    inactive : active
-        pomodoroVolume = (hidden ? 0.2 : 0.5);
-    }
+    public static void OnVisibilityChanged(bool hidden) => pomodoroVolume = (hidden ? 0.2 : 0.5); // inactive : active
+        
     private void GetBackground()
     {
         if (user?.Streak >= 3)
@@ -148,8 +142,4 @@
         }
         StateHasChanged();
     }
-
-
-
-
 }
