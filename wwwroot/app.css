@@ -99,4 +99,10 @@ div {
     stroke-dashoffset: calc((100 - var(--progress)) * 2 * 3.14159 * 76 / 100);
     transition: stroke-dashoffset 1s linear;
 }
+@font-face {
+    font-family: 'Feather Bold';
+    src: url('/Fonts/Feather-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
 

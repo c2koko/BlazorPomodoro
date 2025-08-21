@@ -11,8 +11,18 @@
 <PageTitle>@pomodoroTime.ToString(@"hh\:mm\:ss"), inaktív: @isTabInactive</PageTitle>
 
 <style>html, body {background: url('@backgroundUrl');background-size: cover;background-color: black;} </style>
-<div id="inner-container" style="font-family: 'Comic Sans MS';font-weight:bold">
+<div id="inner-container" style="font-family:'Feather Bold'; font-weight:bold;">
     <h1>Welcome @GetUserName().ToString()!</h1>
+        @if (showCelebration && user?.Streak % 7 == 0)
+        {
+            <div class="celebration-modal">
+                <div class="modal-content">
+                    <h2>🎉 Gratulálok! 🎉</h2>
+                    <p>@user.Streak napos streak!</p>
+                    <button class="btn btn-primary" @onclick="CloseCelebration">OK</button>
+                </div>
+            </div>
+        }
         <h1>Streaks: @GetStreaks().ToString()</h1>
             <button id="clock-container" @onclick="PomodoroToggle"
                     style="--progress:@(GetPomodoroProgress())">
@@ -27,7 +37,21 @@
 </div>
 
 
-<audio id="bg-music" src="music.mp3" autoplay loop onloadedmetadata="this.volume=@pomodoroVolume"></audio>
+<div>Icons made from <a href="https://www.onlinewebfonts.com/icon">svg icons</a>is licensed by CC BY 4.0</div>
+<audio id="bg-music" src="/music.mp3" autoplay loop onloadedmetadata="this.volume=@pomodoroVolume"></audio>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @code {
@@ -90,7 +114,7 @@
     {
         //                    inactive : active
         pomodoroVolume = (hidden ? 0.2 : 0.5);
-		isTabInactive = (hidden ? true : false);
+        isTabInactive = (hidden ? true : false);
     } 
 
     private void GetBackground()
