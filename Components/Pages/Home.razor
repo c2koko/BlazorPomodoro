@@ -8,24 +8,26 @@
 @inject IJSRuntime JSRuntime
 @inject IJSRuntime JS
 @inherits ComponentBase
-<PageTitle>@pomodoroTime</PageTitle>
+<PageTitle>@pomodoroTime.ToString(@"hh\:mm\:ss"), inaktív: @isTabInactive</PageTitle>
 
 <style>html, body {background: url('@backgroundUrl');background-size: cover;background-color: black;} </style>
 <div id="inner-container" style="font-family: 'Comic Sans MS';font-weight:bold">
     <h1>Welcome @GetUserName().ToString()!</h1>
         <h1>Streaks: @GetStreaks().ToString()</h1>
-            <div id="clock-container" @onclick="PomodoroToggle">
-            <p id="time-text">@PomodoroTimerString</p>
-            <div id="clock-background" style="--clock-background-color:Black"></div>
-            <div id="clock-foreground"></div>
-        </div>
+            <button id="clock-container" @onclick="PomodoroToggle"
+                    style="--progress:@(GetPomodoroProgress())">
+                <svg class="progress-ring" width="160" height="160">
+                    <circle class="progress-ring__bg" stroke-width="8" r="76" cx="80" cy="80" />
+                    <circle class="progress-ring__progress" stroke-width="8" r="76" cx="80" cy="80" />
+                </svg>
+                <p id="time-text">@PomodoroTimerString</p>
+            </button>
         <div id="reset-container" @onclick="PomodoroReset"> <img src="https://cdn.shaneduffy.io/moe-pomodoro/reset.webp" />
         </div>
 </div>
 
-<audio id="bg-music" src="music.mp3" autoplay loop onloadedmetadata="this.volume=@pomodoroVolume"></audio>
 
-<h1>hangerő = @pomodoroVolume ------ tab inaktív: @isTabInactive</h1>
+<audio id="bg-music" src="music.mp3" autoplay loop onloadedmetadata="this.volume=@pomodoroVolume"></audio>
 
 
 @code {
@@ -36,7 +38,7 @@
     private bool showCelebration = false;
     private bool jsInitialized = false;
     private string backgroundUrl = "/default-background.png";
-    private bool isTabInactive;
+    private  static bool isTabInactive = false;
     private static double pomodoroVolume = 0.5;
 
     private HttpClient _client = new HttpClient();
@@ -58,6 +60,11 @@
     {
         user = await UserService.GetUser();
         GetBackground();
+
+        _timer.Elapsed += (s, e) => Tick(e.SignalTime);
+        _timer.AutoReset = true;
+        _timer.Enabled = false;
+
         if (user != null && user.Streak > 0 && user.Streak % 7 == 0)
         {
             showCelebration = true;
@@ -79,8 +86,13 @@
         }
     }
     [JSInvokable]
-    public static void OnVisibilityChanged(bool hidden) => pomodoroVolume = (hidden ? 0.2 : 0.5); // inactive : active
-        
+    public static void OnVisibilityChanged(bool hidden)
+    {
+        //                    inactive : active
+        pomodoroVolume = (hidden ? 0.2 : 0.5);
+		isTabInactive = (hidden ? true : false);
+    } 
+
     private void GetBackground()
     {
         if (user?.Streak >= 3)
@@ -140,6 +152,11 @@
         {
             pomodoroTime = time;
         }
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
+    }
+    private int GetPomodoroProgress()
+    {
+        var percent = (int)(pomodoroTime.TotalSeconds / pomodoroOriginalTimeSpan.TotalSeconds * 100);
+        return percent;
     }
 }

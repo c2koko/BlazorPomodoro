@@ -56,3 +56,47 @@ div {
     font-family: 'Feather Bold', sans-serif;
     font-weight: bold;
 }*/
+
+#clock-container {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    border: none;
+    border-radius: 50%;
+    background: black; /* látszódjon */
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+    #clock-container p {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
+    }
+
+
+.progress-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: rotate(-90deg);
+}
+
+.progress-ring__bg {
+    fill: transparent;
+    stroke: #555;
+    opacity: 0.3;
+}
+
+.progress-ring__progress {
+    fill: transparent;
+    stroke: limegreen;
+    stroke-linecap: round;
+    stroke-dasharray: calc(2 * 3.14159 * 76);
+    stroke-dashoffset: calc((100 - var(--progress)) * 2 * 3.14159 * 76 / 100);
+    transition: stroke-dashoffset 1s linear;
+}
+
