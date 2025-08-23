@@ -11,35 +11,24 @@
 <PageTitle>@pomodoroTime.ToString(@"hh\:mm\:ss"), inaktív: @isTabInactive</PageTitle>
 
 <style>html, body {background: url('@backgroundUrl');background-size: cover;background-color: black;} </style>
-<div id="inner-container" style="font-family:'Feather Bold'; font-weight:bold;">
+<div id="outer-container">
     <h1>Welcome @GetUserName().ToString()!</h1>
-        @if (showCelebration && user?.Streak % 7 == 0)
-        {
-            <div class="celebration-modal">
-                <div class="modal-content">
-                    <h2>🎉 Gratulálok! 🎉</h2>
-                    <p>@user.Streak napos streak!</p>
-                    <button class="btn btn-primary" @onclick="CloseCelebration">OK</button>
-                </div>
-            </div>
-        }
-        <h1>Streaks: @GetStreaks().ToString()</h1>
-            <button id="clock-container" @onclick="PomodoroToggle"
-                    style="--progress:@(GetPomodoroProgress())">
-                <svg class="progress-ring" width="160" height="160">
-                    <circle class="progress-ring__bg" stroke-width="8" r="76" cx="80" cy="80" />
-                    <circle class="progress-ring__progress" stroke-width="8" r="76" cx="80" cy="80" />
-                </svg>
-                <p id="time-text">@PomodoroTimerString</p>
-            </button>
-        <div id="reset-container" @onclick="PomodoroReset"> <img src="https://cdn.shaneduffy.io/moe-pomodoro/reset.webp" />
-        </div>
+    <h3>Streaks: @GetStreaks().ToString()</h3>
+    <div id="inner-container">
+        <button id="clock-container" @onclick="PomodoroToggle"
+                style="--progress:@(GetPomodoroProgress())">
+            <svg class="progress-ring" width="160" height="160">
+                <circle class="progress-ring__bg" stroke-width="8" r="76" cx="80" cy="80" />
+                <circle class="progress-ring__progress" stroke-width="8" r="76" cx="80" cy="80" />
+            </svg>
+            <p id="time-text">@PomodoroTimerString</p>
+        </button>
+        <div id="btn-next" @onclick="PomodoroReset">Next</div>
+                
+    </div>
 </div>
-
-
-<div>Icons made from <a href="https://www.onlinewebfonts.com/icon">svg icons</a>is licensed by CC BY 4.0</div>
-<audio id="bg-music" src="/music.mp3" autoplay loop onloadedmetadata="this.volume=@pomodoroVolume"></audio>
-
+<div id="footer">Icons made from <a href="https://www.onlinewebfonts.com/icon">svg icons</a>is licensed by CC BY 4.0</div>
+<audio style="display: none;" autoplay loop controls><source src="/Music/music.mp3" type="audio/mpeg" /></audio>
 
 
 
@@ -62,8 +51,11 @@
     private bool showCelebration = false;
     private bool jsInitialized = false;
     private string backgroundUrl = "/default-background.png";
-    private  static bool isTabInactive = false;
+    private static bool isTabInactive = false;
     private static double pomodoroVolume = 0.5;
+    private DateTime currentTime = DateTime.Now;
+    private DateTime nightEnd = DateTime.Today.AddHours(8);
+    private DateTime nightStart = DateTime.Today.AddHours(20);
 
     private HttpClient _client = new HttpClient();
     private SystemTimer _timer = new SystemTimer(1000);
@@ -79,7 +71,7 @@
 
     public string PomodoroTimerString { get {   return pomodoroTime.ToString(@"mm\:ss");   } }
 
-    // Main methods
+    // Main methods-------------------------------------------------------------------------------------------------------
     protected override async Task OnInitializedAsync()
     {
         user = await UserService.GetUser();
@@ -94,7 +86,6 @@
             showCelebration = true;
         }
     }
-    private void CloseCelebration() => showCelebration = false;
     private string GetUserName() => WindowsIdentity.GetCurrent().Name.Split('\\').Last();
     private string GetStreaks() => user?.Streak.ToString() ?? "0";
 
@@ -121,12 +112,15 @@
     {
         if (user?.Streak >= 3)
         {
-            backgroundUrl = user.Streak % 7 == 0 ? "/fire-background.png" : "/streak-background.png";
+            backgroundUrl = user.Streak % 7 == 0 ? "/Backgrounds/background_fire.png" : "~/Backgrounds/background_streak.png";
         }
-        else { backgroundUrl = "/default-background.png"; }
+        else 
+        { 
+            backgroundUrl = (currentTime >= nightEnd && currentTime <= nightStart) ? "~/Backgrounds/background_daytime.png" : "~/Backgrounds/background_night.png"; 
+        }
     }
 
-    // Pomodoro methods
+    // Pomodoro methods ---------------------------------------------------------------------------------------------------
     private void StartTimer()
     {
         pomodoroStartTime = DateTime.Now;
