@@ -10,10 +10,10 @@
 @inherits ComponentBase
 <PageTitle>@(tabActive ? $"{@PomodoroTimerString}" : "Pomodoro Timer")</PageTitle>
 
-<style>html, body {background: url('@backgroundUrl');background-size: cover;background-color: black;} </style>
+<style>html, body {background: url('@backgroundUrl');background-size: cover;background-color: grey;} </style>
 <div id="outer-container">
-    <h1>Welcome @GetUserName().ToString()!</h1>
-    <h3>Streaks: @GetStreaks().ToString()</h3>
+    <h1 id="container-text">Welcome @GetUserName().ToString()!</h1>
+    <h3 id="container-text">Streaks: @GetStreaks().ToString()</h3>
     <div id="inner-container">
         <button id="clock-container" @onclick="PomodoroToggle"
                 style="--progress:@(GetPomodoroProgress())">
@@ -41,8 +41,8 @@
     private User? user;
     private CancellationTokenSource? timerCts;
     private bool jsInitialized = false;
-	private bool showCelebration = false;
-    private string backgroundUrl = "/Background/background_daytime.png";
+    private bool showCelebration = false;
+    private string backgroundUrl = "/Backgrounds/background_daytime.png";
     private static bool tabActive = false;
     private DateTime currentTime = DateTime.Now;
     private DateTime nightEnd = DateTime.Today.AddHours(8);
@@ -81,11 +81,11 @@
     {
         if (user?.Streak >= 3)
         {
-            backgroundUrl = user.Streak % 7 == 0 ? "/Backgrounds/background_fire.png" : "~/Backgrounds/background_streak.png";
+            backgroundUrl = user.Streak % 7 == 0 ? "/Backgrounds/background_fire2.png" : "/Backgrounds/background_streak.png";
         }
         else
         {
-            backgroundUrl = (currentTime >= nightEnd && currentTime <= nightStart) ? "~/Backgrounds/background_daytime.png" : "~/Backgrounds/background_night.png";
+            backgroundUrl = (currentTime >= nightEnd && currentTime <= nightStart) ? "/Backgrounds/background_daytime.png" : "/Backgrounds/background_night.png";
         }
     }
     private string GetUserName() => WindowsIdentity.GetCurrent().Name.Split('\\').Last();
@@ -160,9 +160,5 @@
         }
         InvokeAsync(StateHasChanged);
     }
-    private int GetPomodoroProgress()
-    {
-        var percent = (int)(pomodoroTime.TotalSeconds / pomodoroOriginalTimeSpan.TotalSeconds * 100);
-        return percent;
-    }
+    private int GetPomodoroProgress() => ((int)(pomodoroTime.TotalSeconds / pomodoroOriginalTimeSpan.TotalSeconds * 100));
 }
