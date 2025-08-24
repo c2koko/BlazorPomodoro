@@ -105,11 +105,12 @@
 
         if (user != null && user.Streak > 0)
         {
-            streakMessage = $"Welcome back! {GetStreaks()} days streak!";
+            string allignmentHelp = "‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ";
+            streakMessage = $"{allignmentHelp}Welcome back! You have {GetStreaks()} days streak!";
         }
         else
         {
-			streakMessage = "Good to see you!";
+            streakMessage = $"Good to see you {@GetUserName()}! Log in every day to increase your streaks 🔥";
         }
         if (!string.IsNullOrEmpty(streakMessage))
         {
