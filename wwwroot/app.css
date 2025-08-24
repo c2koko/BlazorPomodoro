@@ -34,6 +34,12 @@
 /* Next button style */
 #btn-next {
     color: rgb(142, 36, 170);
+    background-color: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 5px 0px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
 }
 /* license placement */
 #footer {
@@ -81,9 +87,6 @@
     stroke-dashoffset: calc((100 - var(--progress)) * 2 * 3.14159 * 76 / 100);
     transition: stroke-dashoffset 1s linear;
 }
-
-
-
 /* notes panel style  */
 #notes-panel {
     position: absolute;
@@ -146,6 +149,57 @@
     padding: 10px 15px;    
     margin-left: 10px;
     cursor: pointer;
+}
+/* Mascot pop-up style */
+#mascot-popup {
+    position: fixed;
+    bottom: 20px;
+    left: 0px;
+    z-index: 1000;
+    animation: slide-in 0.5s ease-out;
+}
+@keyframes slide-in {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+.mascot-container {
+    position: relative;
+    width: 400px;
+    height: auto;
+}
+.mascot-img {
+    width: 100%;
+    height: auto;
+}
+.speech-text {
+    position: absolute;
+    top: 22%;
+    left: 54%;
+    width: 33%;
+    text-align: center;
+    color: rgb(142, 36, 170);
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px;
+    white-space: normal;
+}
+.close-btn {
+    position: absolute;
+    top: 60%; /* Adjust this value to set vertical position */
+    left: 68%; /* Adjust this value to set horizontal position */
+    background: rgb(142, 36, 170);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-family: 'Feather Bold';
 }
 
 
