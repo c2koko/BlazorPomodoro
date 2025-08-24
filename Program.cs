@@ -1,9 +1,7 @@
 using BlazorWeb.Components;
-
 using Microsoft.EntityFrameworkCore;
 using BlazorWeb.Data;
 using BlazorWeb.Services;
-using BlazorWeb.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
