@@ -56,7 +56,7 @@
     private CancellationTokenSource? timerCts;
     private bool jsInitialized = false;
     private bool showCelebration = false;
-    private string backgroundUrl = "/Backgrounds/background_daytime.png";
+    private string backgroundUrl;
     private static bool tabActive = false;
     private DateTime currentTime = DateTime.Now;
     private DateTime nightEnd = DateTime.Today.AddHours(8);
@@ -73,7 +73,6 @@
     private TimeSpan pomodoroOriginalTimeSpan = time25;
     private DateTime pomodoroStartTime;
     private bool pomodoroWork = true;
-
     public string PomodoroTimerString { get {   return pomodoroTime.ToString(@"mm\:ss");   } }
 
     private List<Note> notes = new List<Note>();
