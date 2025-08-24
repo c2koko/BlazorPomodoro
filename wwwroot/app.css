@@ -191,8 +191,8 @@
 }
 .close-btn {
     position: absolute;
-    top: 60%; /* Adjust this value to set vertical position */
-    left: 68%; /* Adjust this value to set horizontal position */
+    top: 60%;
+    left: 68%;
     background: rgb(142, 36, 170);
     color: white;
     border: none;
