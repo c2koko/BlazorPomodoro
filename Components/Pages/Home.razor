@@ -103,7 +103,12 @@
         _timer.AutoReset = true;
         _timer.Enabled = false;
 
-        if (user != null && user.Streak > 0)
+        if (user != null && user.Streak % 7 == 0)
+        {
+            string allignmentHelp = "‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ";
+            streakMessage = $"{allignmentHelp}Congrats! You have been here for {GetStreaks()} days in a row!";
+        }
+        else if(user != null && user.Streak > 0)
         {
             string allignmentHelp = "‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ";
             streakMessage = $"{allignmentHelp}Welcome back! You have {GetStreaks()} days streak!";
@@ -121,7 +126,27 @@
     {
         if (user?.Streak >= 3)
         {
-            backgroundUrl = user.Streak % 7 == 0 ? "/Backgrounds/background_fire2.png" : "/Backgrounds/background_streak.png";
+            if (user.Streak % 7 == 0)
+            {
+                backgroundUrl = "/Backgrounds/background_lava.png";
+            }
+            else
+            {
+                string[] backgrounds = new string[]
+                {
+                "/Backgrounds/background_celebration.png",
+                "/Backgrounds/background_onion.png",
+                "/Backgrounds/background_playground.png",
+                "/Backgrounds/background_crack.png",
+                "/Backgrounds/background_party.png",
+                "/Backgrounds/background_confetti.png",
+                "/Backgrounds/background_joker.png",
+                "/Backgrounds/background_doodle.png"
+                };
+                Random r = new Random();
+                int index = r.Next(backgrounds.Length);
+                backgroundUrl = backgrounds[index];
+            }
         }
         else
         {
