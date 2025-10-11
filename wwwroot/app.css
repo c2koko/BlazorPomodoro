@@ -40,6 +40,7 @@
     padding: 5px 0px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     margin: 5px 0;
+    cursor: pointer;
 }
 /* license placement */
 #footer {
@@ -155,7 +156,7 @@
     position: fixed;
     bottom: 20px;
     left: 0px;
-    z-index: 1000;
+    z-index: 100;
     animation: slide-in 0.5s ease-out;
 }
 @keyframes slide-in {
